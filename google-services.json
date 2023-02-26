@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "440052498924",
+    "project_id": "delma-dev",
+    "storage_bucket": "delma-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:440052498924:android:7d7e60ba58b98a611f40c9",
+        "android_client_info": {
+          "package_name": "com.delma.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "440052498924-it45pu05i8qg7r7m8hu1kko9h38qh2ra.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC04kr8Z3pm-eSc6YK7MjectoBvIwujRTI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "440052498924-it45pu05i8qg7r7m8hu1kko9h38qh2ra.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
