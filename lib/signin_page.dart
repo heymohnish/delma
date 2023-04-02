@@ -1,7 +1,14 @@
+import 'dart:convert';
+import 'dart:ffi';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 import 'package:lottie/lottie.dart';
+import 'package:quickalert/quickalert.dart';
+import 'models/user.dart';
 
 class SignInSlate extends StatefulWidget {
   @override
@@ -70,8 +77,31 @@ class _MyFormState extends State<MyForm> {
   TextEditingController weight = TextEditingController();
   late double heightDouble = 0.0;
   late double weightDouble = 0.0;
-  final List<String> _items = ['Female', 'male', 'Other'];
+  final List<String> _items = ['female', 'male'];
+  final List<String> level = [
+    'Level-1 (Sedentary)',
+    'Level-2 (Lightly active)',
+    'Level-3 (Moderately active)',
+    'Level-4 (Very active)',
+    'Level-5 (Extra active)',
+  ];
+  late String ipAddress;
   late String _selectedItem;
+  // static String email = "";
+  // static String pass = "";
+  User user = User();
+
+  // late String rs_name;
+  // late String rs_mail;
+  // late String rs_password;
+  // late String rs_rePassword;
+  // late String rs_gender;
+  // late Double rs_dob;
+  // late String rs_dob_str;
+  // late Double rs_height;
+  // late Double rs_weight;
+  // late Int rs_level;
+
   // late DateTime _selectedDate;
   void initState() {
     dateinput.text = "";
@@ -137,6 +167,7 @@ class _MyFormState extends State<MyForm> {
                       focusedBorder: myfocusborder(),
                     ),
                     validator: (value) {
+                      user.name = value;
                       if (value!.isEmpty) {
                         return 'Please enter your name';
                       }
@@ -160,15 +191,16 @@ class _MyFormState extends State<MyForm> {
                       focusedBorder: myfocusborder(),
                     ),
                     validator: (value) {
+                      user.mail = value;
                       if (value!.isEmpty) {
                         return 'mail id is madatory';
                       } else {
-                        final bool emailValid = RegExp(
-                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                            .hasMatch(value);
-                        if (!emailValid) {
-                          return 'invalid mail id';
-                        }
+                        // final bool emailValid = RegExp(
+                        //         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                        //     .hasMatch(value);
+                        // if (!emailValid) {
+                        //   return 'invalid mail id';
+                        // }
                       }
                       return null;
                     },
@@ -192,15 +224,16 @@ class _MyFormState extends State<MyForm> {
                       focusedBorder: myfocusborder(),
                     ),
                     validator: (value) {
+                      user.password = value;
                       if (value!.isEmpty) {
                         return 'password is madatory';
                       } else {
-                        final bool passValid = RegExp(
-                          r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$',
-                        ).hasMatch(value);
-                        if (!passValid) {
-                          return '*At least 8 characters long\n*Must contain at least one uppercase letter\n*Must contain at least one lowercase letter\n*Must contain at least one digit';
-                        }
+                        // final bool passValid = RegExp(
+                        //   r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$',
+                        // ).hasMatch(value);
+                        // if (!passValid) {
+                        //   return '*At least 8 characters long\n*Must contain at least one uppercase letter\n*Must contain at least one lowercase letter\n*Must contain at least one digit';
+                        // }
                       }
                     },
                     onSaved: (value) {
@@ -222,12 +255,13 @@ class _MyFormState extends State<MyForm> {
                       focusedBorder: myfocusborder(),
                     ),
                     validator: (value) {
+                      user.rePassword = value;
                       if (value!.isEmpty) {
                         return 'Please enter password again';
                       }
-                      if (value != password.text) {
-                        return 'Please re-check your password';
-                      }
+                      // if (value != password.text) {
+                      //   return 'Please re-check your password';
+                      // }
                     },
                     onSaved: (value) {
                       name.text = value!;
@@ -243,6 +277,7 @@ class _MyFormState extends State<MyForm> {
                       );
                     }).toList(),
                     onChanged: (String? newValue) {
+                      user.gender = newValue;
                       // Do something with the selected value
                     },
                     validator: (item) {
@@ -256,59 +291,90 @@ class _MyFormState extends State<MyForm> {
                         Icons.child_care,
                         color: Colors.black,
                       ),
-                      labelText: "gender",
+                      labelText: "gender*",
                       border: myinputborder(),
                       enabledBorder: myinputborder(),
                       focusedBorder: myfocusborder(),
                     ),
                   ),
 
+                  // SizedBox(height: 20.0),
+                  // TextFormField(
+                  //   controller: dateinput,
+
+                  //   decoration: InputDecoration(
+                  //     prefixIcon: Icon(
+                  //       Icons.calendar_month_outlined,
+                  //       color: Colors.black,
+                  //     ),
+                  //     labelText: "DOB *",
+                  //     border: myinputborder(),
+                  //     enabledBorder: myinputborder(),
+                  //     focusedBorder: myfocusborder(),
+                  //   ),
+                  //   readOnly:
+                  //       true, //set it true, so that user will not able to edit text
+                  //   onTap: () async {
+                  //     DateTime? pickedDate = await showDatePicker(
+                  //         context: context,
+                  //         initialDate: DateTime.now(),
+                  //         firstDate: DateTime(
+                  //             1980), //DateTime.now() - not to allow to choose before today.
+                  //         lastDate: DateTime(2101));
+
+                  //     if (pickedDate != null) {
+                  //       print(
+                  //           pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                  //       String formattedDate =
+                  //           DateFormat('dd-MM-yyyy').format(pickedDate);
+                  //       // user.dob = 21.00 as Double;
+                  //       print(
+                  //           formattedDate); //formatted date output using intl package =>  2021-03-16
+                  //       //you can implement different kind of Date Format here according to your requirement
+
+                  //       setState(() {
+                  //         dateinput.text =
+                  //             formattedDate; //set output date to TextField value.
+                  //       });
+                  //     } else {
+                  //       print("empty");
+                  //     }
+                  //   },
+                  //   validator: (formattedDate) {
+                  //     if (formattedDate!.isEmpty) {
+                  //       return 'dob is mandatory';
+                  //     }
+                  //     return null;
+                  //   },
+                  // ),
+
                   SizedBox(height: 20.0),
                   TextFormField(
                     controller: dateinput,
-
+                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       prefixIcon: Icon(
                         Icons.calendar_month_outlined,
                         color: Colors.black,
                       ),
-                      labelText: "DOB *",
+                      labelText: "DOB*",
                       border: myinputborder(),
                       enabledBorder: myinputborder(),
                       focusedBorder: myfocusborder(),
                     ),
-                    readOnly:
-                        true, //set it true, so that user will not able to edit text
-                    onTap: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(
-                              2000), //DateTime.now() - not to allow to choose before today.
-                          lastDate: DateTime(2101));
-
-                      if (pickedDate != null) {
-                        print(
-                            pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
-                        String formattedDate =
-                            DateFormat('dd-MM-yyyy').format(pickedDate);
-                        print(
-                            formattedDate); //formatted date output using intl package =>  2021-03-16
-                        //you can implement different kind of Date Format here according to your requirement
-
-                        setState(() {
-                          dateinput.text =
-                              formattedDate; //set output date to TextField value.
-                        });
-                      } else {
-                        print("empty");
+                    validator: (value) {
+                      user.dob = double.tryParse(value!);
+                      if (double.tryParse(value!) == null) {
+                        return 'Please enter a valid decimal value';
                       }
-                    },
-                    validator: (formattedDate) {
-                      if (formattedDate!.isEmpty) {
-                        return 'dob is mandatory';
+                      if (double.parse(value) < 18.0 ||
+                          double.parse(value) == 18.0) {
+                        return 'value should be > 18';
                       }
                       return null;
+                    },
+                    onSaved: (value) {
+                      name.text = value!;
                     },
                   ),
                   SizedBox(height: 20.0),
@@ -326,6 +392,7 @@ class _MyFormState extends State<MyForm> {
                       focusedBorder: myfocusborder(),
                     ),
                     validator: (value) {
+                      user.height = double.tryParse(value!);
                       if (double.tryParse(value!) == null) {
                         return 'Please enter a valid decimal value';
                       }
@@ -354,6 +421,7 @@ class _MyFormState extends State<MyForm> {
                       focusedBorder: myfocusborder(),
                     ),
                     validator: (value) {
+                      user.weight = double.tryParse(value!);
                       if (double.tryParse(value!) == null) {
                         return 'Please enter a valid decimal value';
                       }
@@ -364,14 +432,72 @@ class _MyFormState extends State<MyForm> {
                       return null;
                     },
                     onSaved: (value) {
+                      // Double uu = double.tryParse(value);
+
                       name.text = value!;
                     },
                   ),
+                  SizedBox(height: 20.0),
+                  DropdownButtonFormField(
+                    items: level.map((String item) {
+                      return DropdownMenuItem<String>(
+                        value: item,
+                        child: Text(item),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      // 'Level-1 (Sedentary)',
+                      // 'Level-2 (Lightly active)',
+                      // 'Level-3 (Moderately active)',
+                      // 'Level-4 (Very active)',
+                      // 'Level-5 (Extra active)',
+                      user.level = newValue;
+                      // Do something with the selected value
+                    },
+                    validator: (item) {
+                      if (item == null) {
+                        return 'Activity Level is madatory';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(
+                        Icons.fitness_center_rounded,
+                        color: Colors.black,
+                      ),
+                      labelText: "Activity Level*",
+                      border: myinputborder(),
+                      enabledBorder: myinputborder(),
+                      focusedBorder: myfocusborder(),
+                    ),
+                  ),
+
                   SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         // return "";
+                        _createData(user).then((value) async => {
+                              if (value != null)
+                                {
+                                  print("fdsa"),
+                                  await QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.loading,
+                                    title: 'Loading',
+                                    text: 'Fetching your data',
+                                  ),
+                                  await Future.delayed(
+                                      const Duration(milliseconds: 1000)),
+                                  await QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    text: 'Account Created Successfully!',
+                                  )
+                                }
+                              else
+                                {}
+                            });
                       }
                     },
                     child: Text(
@@ -400,5 +526,39 @@ class _MyFormState extends State<MyForm> {
         ]),
       ),
     );
+  }
+}
+
+Future<String?> _createData(User user) async {
+  final dio = Dio();
+  // var ipresponse =
+  //     await dio.get('https://api.jsonbin.io/v3/b/642869bdc0e7653a059bb7a9',
+  //         options: Options(
+  //           headers: {
+  //             "X-Master-Key":
+  //                 "\$2b\$10\$355xlWN8Po4wKmRcFsMUNev9n0bOhYGr8genkiJZ/Jmz9AZTqaKUy",
+  //             'X-Access-Key':
+  //                 '\$2b\$10\$P1oZAlmba6/xQ6SaiODP5unhX3kHk/dDC5ELFrJStOix6fILuBc.q'
+  //           },
+  //         ));
+  // print(ipresponse.data['record']['data'].toString());
+  // // return null;
+  // // ipAddress = ipresponse.data['record']['data']['record'].toString();
+  // String ip = ipresponse.data['record']['data'].toString();
+  final response = await dio.post(
+      'http://' + '192.168.29.175' + ':1234/user/upsert',
+      data: json.encode(user.toJson()));
+  if (response.statusCode! >= 200 && response.statusCode! <= 300) {
+    if (response.data["data"] != null) {
+      // User kk = User.fromJson(response.data["data"]);
+      print(response.data["data"].toString());
+      return response.data["data"].toString();
+    } else {
+      Fluttertoast.showToast(msg: "Mail Already exist");
+      return null;
+    }
+  } else {
+    Fluttertoast.showToast(msg: "server dead");
+    return null;
   }
 }

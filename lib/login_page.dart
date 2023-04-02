@@ -3,11 +3,20 @@ import 'package:delma/signin_page.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'dart:async';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:quickalert/quickalert.dart';
+import 'components/home_page/home_page.dart';
+import 'models/user.dart';
 
 class SecondPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final _formKeyq = GlobalKey<FormState>();
   late String _inputText;
+  static String email = "";
+  static String pass = "";
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +50,16 @@ class SecondPage extends StatelessWidget {
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
+                          email = value.toString();
                           return 'Please enter some text';
                         } else {
-                          final bool emailValid = RegExp(
-                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                              .hasMatch(value);
-                          if (!emailValid) {
-                            return 'invalid mail id';
-                          }
+                          // final bool emailValid = RegExp(
+                          //         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                          //     .hasMatch(value);
+                          email = value.toString();
+                          // if (!emailValid) {
+                          //   return 'invalid mail id';
+                          // }
                         }
                         return null;
                       },
@@ -78,7 +89,10 @@ class SecondPage extends StatelessWidget {
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
+                          pass = value;
                           return 'Please enter some text';
+                        } else {
+                          pass = value;
                         }
                       },
                       onSaved: (value) {
@@ -98,6 +112,33 @@ class SecondPage extends StatelessWidget {
                       _formKeyq.currentState!.validate()) {
                     _formKey.currentState?.save();
                     _formKeyq.currentState?.save();
+                    // String ff = _formKey.currentState!.toString();
+                    // _formKey.currentState!.toString()
+                    // final dio = Dio();
+                    // dio();
+                    _getData(email, pass).then((value) => {
+                          if (value == null)
+                            {
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //       builder: (context) =>
+                              //           HomePage(name: "name")),
+                              // )
+                            }
+                          else
+                            {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        HomePage(value1: value)),
+                              )
+                            }
+                        });
+                    // if (ff == true) {}
+                    // print(ff);
+                    // print(ff);
                     // Do something with the user input, such as save it to a database or display it on a new screen
                   }
                 },
@@ -186,52 +227,52 @@ class SecondPage extends StatelessWidget {
     );
   }
 }
+// void fetchData() async {
+//   try {
+//     final response = await dio
+//         .get('http://127.0.0.1:1234/user/exist?mail=mohnish@gmail.com');
+//     if (response.statusCode == 200) {
+//       // Handle the response data here
+//       print(response.data);
+//     } else {
+//       // Handle errors
+//       print('Request failed with status: ${response.statusCode}.');
+//     }
+//   } catch (e) {
+//     // Handle any exceptions that occur
+//     print('Request failed with error: $e.');
+//   }
+// }
 
-class MyInputPage extends StatefulWidget {
-  @override
-  _MyInputPageState createState() => _MyInputPageState();
-}
-
-class _MyInputPageState extends State<MyInputPage> {
-  final _formKey = GlobalKey<FormState>();
-  late String _inputText;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('My Input Page'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            TextFormField(
-              decoration: InputDecoration(
-                hintText: 'Enter your text here',
-              ),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },
-              onSaved: (value) {
-                _inputText = value!;
-              },
-            ),
-            ElevatedButton(
-              child: Text('Submit'),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState?.save();
-                  // Do something with the user input, such as save it to a database or display it on a new screen
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+Future<User?> _getData(String email, String pass) async {
+  final dio = Dio();
+  // final response = await http.get(Uri.parse(
+  //     'http://192.168.0.143:1234/user/exist?mail=mohnsh@gmail.com&code=mohnish'));
+  final response = await dio.get(
+      'http://192.168.29.175:1234/user/exist?mail=' + email + '&code=' + pass);
+  if (response.statusCode! >= 200 && response.statusCode! <= 300) {
+    if (response.data["data"] != null &&
+        response.data["data"]["exist"] != null &&
+        response.data["data"]["exist"] == true) {
+      User kk = User.fromJson(response.data["data"]);
+      print(response.data["data"].toString());
+      return User.fromJson(response.data["data"]);
+    } else if (response.data["data"] != null &&
+        response.data["data"]["exist"] != null &&
+        response.data["data"]["exist"] == false) {
+      Fluttertoast.showToast(msg: "Invalid mail or password");
+      return null;
+    } else {
+      Fluttertoast.showToast(msg: "Invalid mail or password");
+      return null;
+    }
+    // Handle the response here
+  } else {
+    Fluttertoast.showToast(msg: "server dead");
+    return null;
   }
+
+//   }catch{
+// return false;
+//   }
 }
