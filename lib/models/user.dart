@@ -15,6 +15,11 @@ class User {
   double? weight;
   double? bmr;
   double? bmi;
+  double? total_ENERC_KCAL;
+  double? total_PROCNT;
+  double? total_FAT;
+  double? total_CHOCDF;
+  double? total_FIBTG;
   double? activeBMR;
   String? level;
   User(
@@ -33,7 +38,12 @@ class User {
       this.bmr,
       this.bmi,
       this.activeBMR,
-      this.level});
+      this.level,
+      this.total_ENERC_KCAL,
+      this.total_PROCNT,
+      this.total_FAT,
+      this.total_CHOCDF,
+      this.total_FIBTG});
 
   factory User.fromJson(json) {
     return User(
@@ -52,7 +62,12 @@ class User {
         bmr: json["bmr"],
         bmi: json["bmi"],
         activeBMR: json["activeBMR"],
-        level: json["level"]);
+        level: json["level"],
+        total_ENERC_KCAL: json["total_ENERC_KCAL"],
+        total_PROCNT: json["total_PROCNT"],
+        total_FAT: json["total_FAT"],
+        total_CHOCDF: json["total_CHOCDF"],
+        total_FIBTG: json["total_FIBTG"]);
   }
   User createInstance(json) {
     return User.fromJson(json);

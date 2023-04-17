@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 
 import 'package:lottie/lottie.dart';
 import 'package:quickalert/quickalert.dart';
+import 'login_page.dart';
 import 'models/user.dart';
 
 class SignInSlate extends StatefulWidget {
@@ -357,7 +358,7 @@ class _MyFormState extends State<MyForm> {
                         Icons.calendar_month_outlined,
                         color: Colors.black,
                       ),
-                      labelText: "DOB*",
+                      labelText: "Age*",
                       border: myinputborder(),
                       enabledBorder: myinputborder(),
                       focusedBorder: myfocusborder(),
@@ -480,20 +481,28 @@ class _MyFormState extends State<MyForm> {
                         _createData(user).then((value) async => {
                               if (value != null)
                                 {
-                                  print("fdsa"),
-                                  await QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.loading,
-                                    title: 'Loading',
-                                    text: 'Fetching your data',
-                                  ),
-                                  await Future.delayed(
-                                      const Duration(milliseconds: 1000)),
+                                  // print("fdsa"),
+                                  // await QuickAlert.show(
+                                  //   context: context,
+                                  //   type: QuickAlertType.loading,
+                                  //   title: 'Loading',
+                                  //   text: 'Fetching your data',
+                                  // ),
+                                  // await Future.delayed(
+                                  //     const Duration(milliseconds: 1000)),
                                   await QuickAlert.show(
                                     context: context,
                                     type: QuickAlertType.success,
                                     text: 'Account Created Successfully!',
-                                  )
+                                  ),
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => SecondPage())),
+
+                                  // MaterialPageRoute(
+                                  //     builder: (context) =>
+                                  //         HomePage(value1: value)),)
                                 }
                               else
                                 {}
